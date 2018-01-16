@@ -14,8 +14,19 @@ router.get('/', function (req, res) {
 //   res.render('index');
 // })
 
-router.use(express.static('/public'), function(req, res) {
-  res.render('index');
+router.use(express.static('public'));
+
+router.get('/users/:name/', function(req, res) {
+  var name = req.params.name;
+  var list = tweetBank.find( {name: name} );
+  console.log('LIST', list);
+  res.render('index', {tweets : list});
+});
+
+router.get('/users/:id/', function (req, res) {
+  var id = (req.params.id) * 1;
+  var list = tweetBank.find( {id : id});
+  res.render('index', {tweets : id});
 });
 
 

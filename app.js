@@ -16,7 +16,7 @@ const routes = require('./routes');
 
 app.use('/', routes);
 
-app.use(express.static('public'));
+
 
 app.use(morgan(function (tokens, req, res) {
   return [
