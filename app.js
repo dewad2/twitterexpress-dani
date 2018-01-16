@@ -1,18 +1,40 @@
 const express = require('express');
 const app = express();
+const chalk = require('chalk');
+const morgan = require('morgan');
+const nunjucks = require('nunjucks');
 
-app.use((req,res,next) => {
-  console.log('Request Type: ', req.method);
-  next();
-},
-  (req,res,next) => {
-  console.log('Request URL:', req.originalUrl);
-  next();
-});
+// app.use((req,res,next) => {
+// //   console.log('Request Type: ', req.method);
+// //   next();
+// // },
+// //   (req,res,next) => {
+// //   console.log('Request URL:', req.originalUrl);
+// //   next();
+// });
+
+
+app.use(morgan(function (tokens, req, res) {
+  return [
+    tokens.method(req, res),
+    tokens.url(req, res),
+    tokens.status(req, res),
+    tokens.res(req, res, 'content-length'), '-',
+    tokens['response-time'](req, res), 'ms'
+  ].join(' ')
+}))
+
 
 app.get('/', (req,res) => {
-  res.write('It\'s just the beginning...')
-  res.end();
+  const people = [{name: 'Full'}, {name: 'Stacker'}, {name: 'Son'}];
+  res.render('./index', {title: 'Hall of Fame', people: people}, function(err, html) {
+  if(err) throw err;
+  res.send(html);
+});
+
+  // res.write('It\'s just the beginning...')
+
+  // res.end();
   });
 
 
@@ -21,6 +43,30 @@ app.get('/news', (req,res) => {
   res.end();
 })
 
+app.engine('html', nunjucks.render);
 
+app.set('view engine', 'html');
+
+nunjucks.configure('/views');
+
+var locals = {
+    title: 'An Example',
+    people: [
+        { name: 'Gandalf'},
+        { name: 'Frodo' },
+        { name: 'Hermione'}
+    ]
+};
+
+
+
+
+
+nunjucks.configure('views', {noCache: true});
+
+nunjucks.render('index.html', locals, function (err, output) {
+    if (err) throw err;
+    console.log(output);
+});
 
 app.listen(3000, () => console.log('server listening'));
