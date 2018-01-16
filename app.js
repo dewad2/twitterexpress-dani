@@ -3,6 +3,7 @@ const app = express();
 const chalk = require('chalk');
 const morgan = require('morgan');
 const nunjucks = require('nunjucks');
+const routes = require('./routes');
 
 // app.use((req,res,next) => {
 // //   console.log('Request Type: ', req.method);
@@ -13,6 +14,9 @@ const nunjucks = require('nunjucks');
 // //   next();
 // });
 
+app.use('/', routes);
+
+app.use(express.static('public'));
 
 app.use(morgan(function (tokens, req, res) {
   return [
@@ -24,24 +28,26 @@ app.use(morgan(function (tokens, req, res) {
   ].join(' ')
 }))
 
+// router.get('/news', (req,res) => {
+//   res.write('This is not Fox news.');
+//   res.end();
+// })
 
-app.get('/', (req,res) => {
-  const people = [{name: 'Full'}, {name: 'Stacker'}, {name: 'Son'}];
-  res.render('./index', {title: 'Hall of Fame', people: people}, function(err, html) {
-  if(err) throw err;
-  res.send(html);
-});
+
+// app.get('/', (req,res) => {
+//   const people = [{name: 'Full'}, {name: 'Stacker'}, {name: 'Son'}];
+//   res.render('./index', {title: 'Hall of Fame', people: people}, function(err, html) {
+//   if(err) throw err;
+//   res.send(html);
+// });
 
   // res.write('It\'s just the beginning...')
 
   // res.end();
-  });
+  // });
 
 
-app.get('/news', (req,res) => {
-  res.write('This is not Fox news.');
-  res.end();
-})
+
 
 app.engine('html', nunjucks.render);
 
