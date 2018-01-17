@@ -1,32 +1,37 @@
 const express = require('express');
-const router = express.Router();
-// could use one line instead: const router = require('express').Router();
+const router = express.Router(); //middleware function
 const tweetBank = require('../tweetBank');
 
-router.get('/', function (req, res) {
-  let tweets = tweetBank.list();
-  res.render('index', { tweets: tweets } );
+
+router.get('/', function (req, res, next) {
+  var tweets = tweetBank.list();
+  res.render('index', { title : 'Twitter.js', tweets: tweets, showForm : true });
 });
 
 
 // router.get('/stylesheets/style.css', function(req, res) {
-//   res.sendFile('/Users/danidewaal/Desktop/1801-gh-ny-library/twitter-js/public/stylesheets/style.css');
+//   res.sendFile('/Users/danidewaal/Desktop/1801-gh-ny-library/twitter-js/public/stylesheets/style.css'); //long version of using express.static
 //   res.render('index');
 // })
 
-router.use(express.static('public'));
+// router.use(express.static('public')); ====> have put this in app.js
 
-router.get('/users/:name/', function(req, res) {
+router.get('/users/:name', function(req, res, next) {
   var name = req.params.name;
   var list = tweetBank.find( {name: name} );
-  console.log('LIST', list);
-  res.render('index', {tweets : list});
+  res.render('index', {title : 'Twitter.js', tweets : list, showForm : true, username : req.params.name} );
 });
 
-router.get('/users/:id/', function (req, res) {
-  var id = (req.params.id) * 1;
-  var list = tweetBank.find( {id : id});
-  res.render('index', {tweets : id});
+router.get('/tweets/:id', function (req, res, next) {
+  var id = Number(req.params.id);
+  var tweetsWithId = tweetBank.find( {id : id} );
+  res.render('index', {tweets : tweetsWithId});
+});
+
+
+router.post('/tweets', function(req,res,next) {
+  tweetBank.add(req.body.name, req.body.text);
+  res.redirect();
 });
 
 

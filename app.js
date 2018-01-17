@@ -1,9 +1,9 @@
 const express = require('express');
 const app = express();
-const chalk = require('chalk');
 const morgan = require('morgan');
-const nunjucks = require('nunjucks');
+const swig = require('swig'); // templating engine
 const routes = require('./routes');
+const bodyParser = require('body-parser');
 
 // app.use((req,res,next) => {
 // //   console.log('Request Type: ', req.method);
@@ -14,57 +14,18 @@ const routes = require('./routes');
 // //   next();
 // });
 
-app.use('/', routes);
-
-
+app.set('views', __dirname + '/views'); //swig boilerplate
+app.set('view engine', 'html'); //what file extension do our templates have
+app.engine('html', swig.renderFile); //how to render html files
+swig.setDefaults({cache : false});
 
 app.use(morgan('dev'));
 
-// router.get('/news', (req,res) => {
-//   res.write('This is not Fox news.');
-//   res.end();
-// })
+app.use(express.static('public')); // can have this here or in routes folder
 
+app.use(bodyParser.urlencoded({extended : true })); //for HTML form submits
 
-// app.get('/', (req,res) => {
-//   const people = [{name: 'Full'}, {name: 'Stacker'}, {name: 'Son'}];
-//   res.render('./index', {title: 'Hall of Fame', people: people}, function(err, html) {
-//   if(err) throw err;
-//   res.send(html);
-// });
+app.use('/', routes); // middleware function
 
-  // res.write('It\'s just the beginning...')
-
-  // res.end();
-  // });
-
-
-
-
-app.engine('html', nunjucks.render);
-
-app.set('view engine', 'html');
-
-nunjucks.configure('/views');
-
-var locals = {
-    title: 'An Example',
-    people: [
-        { name: 'Gandalf'},
-        { name: 'Frodo' },
-        { name: 'Hermione'}
-    ]
-};
-
-
-
-
-
-nunjucks.configure('views', {noCache: true});
-
-nunjucks.render('index.html', locals, function (err, output) {
-    if (err) throw err;
-    console.log(output);
-});
 
 app.listen(3000, () => console.log('server listening'));
